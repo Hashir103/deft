@@ -19,9 +19,9 @@ async def get_data(l: dict):
             data = scraper.getTickets(url)  # Call your scraper function
             channel = client.get_channel(1166414794639822918)  # Replace with the actual channel ID
             if data[0]:
-                await channel.send(f"{event} Tickets Available for <{url}>. @everyone")
+                await channel.send(f"{event} Tickets Available. Link: <{url}>. @everyone")
                 await channel.send(scraper.printTicket(data[1]))
-        await asyncio.sleep(300)  # Sleep for 5 minutes (300 seconds)
+        await asyncio.sleep(30)  # Sleep for 5 minutes (300 seconds)
 
 @client.event
 async def on_ready():
