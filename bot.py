@@ -44,7 +44,7 @@ async def get_data():
 @tasks.loop(hours=1)
 async def check_alive():
     channel = bot.get_channel(1166414794639822918)
-    await channel.send("I'm alive. Kelly is still a clown :clown:")
+    await channel.send("I'm alive")
 
 @check_alive.before_loop
 async def before_check_alive():
