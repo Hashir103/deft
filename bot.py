@@ -1,7 +1,7 @@
 # bot.py
 # type: ignore
-import os
 import discord
+import os
 import scraper
 import asyncio
 from dotenv import load_dotenv
@@ -10,34 +10,39 @@ import datetime
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-intents = discord.Intents.all()
-client = discord.Client(intents=intents)
+class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-async def get_data(l: dict):
-    while True:
-        for event in l:
-            url = l[event]
-            data = scraper.getTickets(url)  # Call your scraper function
-            channel = client.get_channel(1166414794639822918)  # Replace with the actual channel ID
-            if data[0]:
-                await channel.send(f"{event} Tickets Available. Link: <{url}>. @everyone")
-                await channel.send(scraper.printTicket(data[1]))
-            else:
-                print(str(datetime.datetime.now()) + " "  + str(data[1]))
+    async def setup_hook(self) -> None:
+        # create the background task and run it in the background
+        self.bg_task = self.loop.create_task(self.my_background_task())
 
-        if datetime.datetime.now().minute == 42:
-            await channel.send(f"Still alive, and Kelly is still a clown :clown:")
-        await asyncio.sleep(15)
+    async def on_ready(self):
+        print(f'Logged in as {self.user} (ID: {self.user.id})')
+        print('------')
 
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if message.content == 'ping':
-        await message.channel.send('pong')
+        channel = self.get_channel(1166414794639822918)  # channel ID goes here
+        await channel.send("I'm alive")
 
-@client.event
-async def on_ready():
-    print(f'{client.user.name} has connected to Discord!')
-    await get_data({"Finals":"https://www.globalinterpark.com/product/23010160?lang=en", "Semi-Finals":"https://www.globalinterpark.com/product/23009895?lang=en"})  # Start the background task
+    async def my_background_task(self):
+        await self.wait_until_ready()
+        l = {"Finals":"https://www.globalinterpark.com/product/23010160?lang=en", "Semi-Finals":"https://www.globalinterpark.com/product/23009895?lang=en"}
+        channel = self.get_channel(1166414794639822918)  # channel ID goes here
+        while not self.is_closed():
+            for event in l:
+                url = l[event]
+                data = await scraper.getTickets(url)  # Call your scraper function
 
+                if datetime.datetime.now().minute == 42:
+                    await channel.send(f"Still alive, and Kelly is still a clown :clown:")
+                if data[0]:
+                    info = await scraper.printTicket(data[1])
+                    message = f"{event} Tickets Available. Link: <{url}>. @everyone\n {info}"
+                    await channel.send(message)
+                else:
+                    print(str(datetime.datetime.now()) + " "  + str(data[1]))
+            await asyncio.sleep(10)  # task runs every 60 seconds
+
+client = MyClient(intents=discord.Intents.default())
 client.run(TOKEN)

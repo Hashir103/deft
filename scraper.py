@@ -7,8 +7,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from bs4 import BeautifulSoup
+import asyncio
 
-def getTickets(url: str) -> list: 
+async def getTickets(url: str) -> list: 
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless mode
@@ -86,7 +87,7 @@ def getTickets(url: str) -> list:
 
     return [seat_available, tier_seat_dict]
 
-def printTicket(tier_seat_dict: dict):
+async def printTicket(tier_seat_dict: dict):
     # Print the dictionary
     s = ""
     for tier, seat_count in tier_seat_dict.items():
