@@ -24,7 +24,16 @@ async def get_data(l: dict):
                 await channel.send(scraper.printTicket(data[1]))
             else:
                 print(str(datetime.datetime.now()) + " "  + str(data[1]))
-        await asyncio.sleep(10)  # Sleep for 5 minutes (300 seconds)
+
+        if datetime.datetime.now().minute == 42:
+            await channel.send(f"Still alive, and Kelly is still a clown :clown:")
+        await asyncio.sleep(15)
+
+async def on_message(message):
+    if message.author == client.user:
+        return
+    if message.content == 'ping':
+        await message.channel.send('pong')
 
 @client.event
 async def on_ready():
