@@ -10,12 +10,13 @@ from bs4 import BeautifulSoup
 
 def getTickets(url: str) -> list: 
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
-    # chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless mode
-    # chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
-    # chrome_options.add_argument("--no-sandbox")  # Add this option for Linux
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless mode
+    chrome_options.add_argument('window-size=1920x1080');
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-    driver = webdriver.Chrome(service=Service("/opt/homebrew/bin/chromedriver"), options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     # Seats Available
     seat_available = False
@@ -54,11 +55,12 @@ def getTickets(url: str) -> list:
     # Now, you can select the 2nd option (index 1)
     play_time_select = Select(play_time_dropdown)
     play_time_select.select_by_index(1)
-
+    
     # Wait for the "Available Seats" element to be populated
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_element_located((By.ID, "remain_seat")))
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "table")))
 
+    
     # Get and print the remaining seats table
     remaining_seats_element = driver.find_element(By.ID, "remain_seat")
     remaining_seats_html = remaining_seats_element.get_attribute('innerHTML')
@@ -75,7 +77,7 @@ def getTickets(url: str) -> list:
         if seat_count > 0: 
             seat_available = True
         tier_seat_dict[tier] = seat_count
-
+    
     # Switch back to the default content
     driver.switch_to.default_content()
 

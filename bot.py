@@ -5,6 +5,7 @@ import discord
 import scraper
 import asyncio
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -21,11 +22,13 @@ async def get_data(l: dict):
             if data[0]:
                 await channel.send(f"{event} Tickets Available. Link: <{url}>. @everyone")
                 await channel.send(scraper.printTicket(data[1]))
-        await asyncio.sleep(30)  # Sleep for 5 minutes (300 seconds)
+            else:
+                print(str(datetime.datetime.now()) + " "  + str(data[1]))
+        await asyncio.sleep(10)  # Sleep for 5 minutes (300 seconds)
 
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
-    await get_data({"Finals":"https://www.globalinterpark.com/product/23010160?lang=en", "Semi-Finals":"https://www.globalinterpark.com/product/23009895?lang=en", "Quarter-Finals":"https://www.globalinterpark.com/product/23009894?lang=en"})  # Start the background task
+    await get_data({"Finals":"https://www.globalinterpark.com/product/23010160?lang=en", "Semi-Finals":"https://www.globalinterpark.com/product/23009895?lang=en"})  # Start the background task
 
 client.run(TOKEN)
